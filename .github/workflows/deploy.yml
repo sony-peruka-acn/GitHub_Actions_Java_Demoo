@@ -65,3 +65,17 @@ jobs:
       run: |
         kubectl get pods -n java-demo-namespace
         kubectl get svc -n java-demo-namespace
+
+    - name: Wait for LoadBalancer and Display Full URL
+      run: |
+        echo "⏳ Waiting for LoadBalancer IP..."
+        sleep 60
+
+        EXTERNAL_IP=$(kubectl get svc java-app-service -n java-demo-namespace -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+        
+        if [ -z "$EXTERNAL_IP" ]; then
+          echo "❌ LoadBalancer IP not available yet."
+          exit 1
+        fi
+
+        echo "✅ Your app is available at: http://$EXTERNAL_IP/hello"
